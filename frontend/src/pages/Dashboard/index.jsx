@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './index.css';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
@@ -43,24 +43,6 @@ plugins: {
 };
 
 const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-
-export const data1 = {
-    labels,
-    datasets: [
-      {
-        label: 'Dataset 1',
-        data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      },
-      {
-        label: 'Dataset 2',
-        data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      },
-    ],
-  };
 
 export const data2 = {
     labels,
@@ -117,6 +99,47 @@ datasets: [
 };
 
 const Dashboard = () => {
+
+    const [data1, setData1] = useState({
+        labels,
+        datasets: [
+          {
+            label: 'Dataset 1',
+            data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          },
+          {
+            label: 'Dataset 2',
+            data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
+            borderColor: 'rgb(53, 162, 235)',
+            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+          },
+        ],
+      })
+  
+    useEffect(() => {
+        setInterval(function(){
+            setData1({
+                labels,
+                datasets: [
+                  {
+                    label: 'Dataset 1',
+                    data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                  },
+                  {
+                    label: 'Dataset 2',
+                    data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
+                    borderColor: 'rgb(53, 162, 235)',
+                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                  },
+                ],
+              })
+        }, 60000);
+    })
+
     return(
         <>
             <Navbar bg="dark" variant="dark">
