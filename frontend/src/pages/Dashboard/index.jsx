@@ -44,21 +44,21 @@ const Dashboard = () => {
 
     const responseapi = [
         {
-            "timestamp": "2022-02-10 00:00:10",
+            "timestamp": "00:00:10",
             "temperature":50,
             "humidity":80,
             "statusLed1": 0,
             "statusLed2": 1
         },
         {
-            "timestamp": "2022-02-10 00:00:30",
+            "timestamp": "00:00:30",
             "temperature":60,
             "humidity":85,
             "statusLed1": 1,
             "statusLed2": 1
         },
         {
-            "timestamp": "2022-02-10 00:00:50",
+            "timestamp": "00:00:50",
             "temperature":55,
             "humidity": 90,
             "statusLed1": 1,
@@ -120,52 +120,56 @@ const Dashboard = () => {
         })
   
     useEffect(() => {
+        setlamp1(responseapi[responseapi.length - 1].statusLed1)
+        setlamp2(responseapi[responseapi.length - 1].statusLed2)
         setInterval(() => {
             setData1({
-                labels,
-                datasets: [
-                  {
-                    label: 'Temperatura',
-                    data: responseapi.map(a => a.temperature),
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                  },
-                ],
-              })
-              setData2({
-                labels,
-                datasets: [
-                    {
-                        label: 'Umidade',
-                        data: responseapi.map(a => a.humidity),
-                        borderColor: 'rgb(30, 166, 66)',
-                        backgroundColor: 'rgba(30, 166, 66, 0.5)',
-                    }
-                ],
-              })
-              setData4({
-                labels,
-                datasets: [
-                    {
-                        label: 'Lampada 1',
-                        data: responseapi.map(a => a.statusLed1),
-                        borderColor: 'rgb(20, 20, 219)',
-                        backgroundColor: 'rgba(20, 20, 219, 0.5)',
-                    }
-                ],
-                })
-              setData5({
-                labels,
-                datasets: [
-                    {
-                        label: 'Lampada 2',
-                        data: responseapi.map(a => a.statusLed2),
-                        borderColor: 'rgb(153, 20, 219)',
-                        backgroundColor: 'rgba(153, 20, 219, 0.5)',
-                    }
-                ],
-                })
-              console.log(new Date())
+            labels,
+            datasets: [
+                {
+                label: 'Temperatura',
+                data: responseapi.map(a => a.temperature),
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                },
+            ],
+            })
+            setData2({
+            labels,
+            datasets: [
+                {
+                    label: 'Umidade',
+                    data: responseapi.map(a => a.humidity),
+                    borderColor: 'rgb(30, 166, 66)',
+                    backgroundColor: 'rgba(30, 166, 66, 0.5)',
+                }
+            ],
+            })
+            setData4({
+            labels,
+            datasets: [
+                {
+                    label: 'Lampada 1',
+                    data: responseapi.map(a => a.statusLed1),
+                    borderColor: 'rgb(20, 20, 219)',
+                    backgroundColor: 'rgba(20, 20, 219, 0.5)',
+                }
+            ],
+            })
+            setData5({
+            labels,
+            datasets: [
+                {
+                    label: 'Lampada 2',
+                    data: responseapi.map(a => a.statusLed2),
+                    borderColor: 'rgb(153, 20, 219)',
+                    backgroundColor: 'rgba(153, 20, 219, 0.5)',
+                }
+            ],
+            })
+            setlamp1(responseapi[responseapi.length - 1].statusLed1)
+            setlamp2(responseapi[responseapi.length - 1].statusLed2)
+            console.log(new Date())
         }, 300000);
     })
 
