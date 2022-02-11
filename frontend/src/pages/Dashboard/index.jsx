@@ -4,7 +4,6 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 
 import {
@@ -13,96 +12,95 @@ import {
     LinearScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend,
   } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-
-import faker from 'faker'
+import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(
 CategoryScale,
 LinearScale,
 PointElement,
 LineElement,
+BarElement,
 Title,
 Tooltip,
 Legend
 );
 
-const Dashboard = () => {
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: {
-            position: 'top',
-            },
+const options = {
+    responsive: true,
+    plugins: {
+        legend: {
+        position: 'top',
         },
-    };
+    },
+};
 
-    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+const Dashboard = () => {
+
+    const responseapi = [
+        {
+            "timestamp": "2022-02-10 00:00:10",
+            "temperature":50,
+            "humidity":80,
+            "statusLed1": 0,
+            "statusLed2": 1
+        },
+        {
+            "timestamp": "2022-02-10 00:00:30",
+            "temperature":60,
+            "humidity":85,
+            "statusLed1": 1,
+            "statusLed2": 1
+        },
+        {
+            "timestamp": "2022-02-10 00:00:50",
+            "temperature":55,
+            "humidity": 90,
+            "statusLed1": 1,
+            "statusLed2": 0
+        }
+    ]
+
+    const labels = responseapi.map(a => a.timestamp);
+
+    const [lamp1, setlamp1] = useState(0)
+    const [lamp2, setlamp2] = useState(0)
 
     const [data1, setData1] = useState({
         labels,
         datasets: [
             {
                 label: 'Temperatura',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
+                data: responseapi.map(a => a.temperature),
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            },
-            {
-                label: 'Umidade',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
-                borderColor: 'rgb(30, 166, 66)',
-                backgroundColor: 'rgba(30, 166, 66, 0.5)',
-            },
-            {
-                label: 'Luminosidade',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
-                borderColor: 'rgb(20, 20, 219)',
-                backgroundColor: 'rgba(20, 20, 219, 0.5)',
-            },
-            {
-                label: 'Pressão',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
-                borderColor: 'rgb(153, 20, 219)',
-                backgroundColor: 'rgba(153, 20, 219, 0.5)',
             }
         ],
       })
 
     const [data2, setData2] = useState({
-    labels,
-    datasets: [
-        {
-        label: 'Temperatura',
-        data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        },
-    ],
-    })
-
-    const [data3, setData3] = useState({
         labels,
         datasets: [
             {
                 label: 'Umidade',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
+                data: responseapi.map(a => a.humidity),
                 borderColor: 'rgb(30, 166, 66)',
                 backgroundColor: 'rgba(30, 166, 66, 0.5)',
-            },
+            }
         ],
-        })
+    })
 
     const [data4, setData4] = useState({
         labels,
         datasets: [
             {
-                label: 'Luminosidade',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
+                label: 'Lampada 1',
+                data: responseapi.map(a => a.statusLed1),
                 borderColor: 'rgb(20, 20, 219)',
                 backgroundColor: 'rgba(20, 20, 219, 0.5)',
             }
@@ -113,8 +111,8 @@ const Dashboard = () => {
         labels,
         datasets: [
             {
-                label: 'Pressão',
-                data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
+                label: 'Lampada 2',
+                data: responseapi.map(a => a.statusLed2),
                 borderColor: 'rgb(153, 20, 219)',
                 backgroundColor: 'rgba(153, 20, 219, 0.5)',
             }
@@ -122,114 +120,88 @@ const Dashboard = () => {
         })
   
     useEffect(() => {
-        console.log(new Date())
         setInterval(() => {
             setData1({
                 labels,
                 datasets: [
                   {
                     label: 'Temperatura',
-                    data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
+                    data: responseapi.map(a => a.temperature),
                     borderColor: 'rgb(255, 99, 132)',
                     backgroundColor: 'rgba(255, 99, 132, 0.5)',
                   },
-                  {
-                    label: 'Umidade',
-                    data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
-                    borderColor: 'rgb(30, 166, 66)',
-                    backgroundColor: 'rgba(30, 166, 66, 0.5)',
-                  },
-                  {
-                    label: 'Luminosidade',
-                    data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
-                    borderColor: 'rgb(20, 20, 219)',
-                    backgroundColor: 'rgba(20, 20, 219, 0.5)',
-                  },
-                  {
-                    label: 'Pressão',
-                    data: labels.map(() => faker.datatype.number({ min: 0, max: 100 })),
-                    borderColor: 'rgb(153, 20, 219)',
-                    backgroundColor: 'rgba(153, 20, 219, 0.5)',
-                  }
                 ],
               })
+              setData2({
+                labels,
+                datasets: [
+                    {
+                        label: 'Umidade',
+                        data: responseapi.map(a => a.humidity),
+                        borderColor: 'rgb(30, 166, 66)',
+                        backgroundColor: 'rgba(30, 166, 66, 0.5)',
+                    }
+                ],
+              })
+              setData4({
+                labels,
+                datasets: [
+                    {
+                        label: 'Lampada 1',
+                        data: responseapi.map(a => a.statusLed1),
+                        borderColor: 'rgb(20, 20, 219)',
+                        backgroundColor: 'rgba(20, 20, 219, 0.5)',
+                    }
+                ],
+                })
+              setData5({
+                labels,
+                datasets: [
+                    {
+                        label: 'Lampada 2',
+                        data: responseapi.map(a => a.statusLed2),
+                        borderColor: 'rgb(153, 20, 219)',
+                        backgroundColor: 'rgba(153, 20, 219, 0.5)',
+                    }
+                ],
+                })
               console.log(new Date())
-        }, 60000);
+        }, 300000);
     })
 
     return(
         <>
-            <Navbar bg="dark" variant="dark">
+            <Navbar bg="dark" variant="dark" sticky="top">
                 <Container>
                     <Navbar.Brand>
-                        Dashboard SmartHome
+                        SmartHome
                     </Navbar.Brand>
                 </Container>
             </Navbar>
             <Container className="mt-5">
+                <Row >
+                    <h1>Dashboard</h1>
+                </Row>
                 <Row>
-                    <Col>
+                    <Col className="text-center">
+                        <h3>Temperatura</h3>
                         <Line options={options} data={data1} />
                     </Col>
-                </Row>
-                <Row>
-                    <Col md={6}>
-                        <Form className="form">
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Button variant="primary" type="submit">
-                                Filtrar
-                            </Button>
-                        </Form>
+                    <Col className="text-center">
+                        <h3>Umidade</h3>
                         <Line options={options} data={data2} />
                     </Col>
-                    <Col md={6}>
-                        <Form className="form">
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Button variant="primary" type="submit">
-                                Filtrar
-                            </Button>
-                        </Form>
-                        <Line options={options} data={data3} />
-                    </Col>
                 </Row>
                 <Row>
-                    <Col md={6}>
-                        <Form className="form">
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Button variant="primary" type="submit">
-                                Filtrar
-                            </Button>
-                        </Form>
-                        <Line options={options} data={data4} />
+                    <Col md={6} className="text-center">
+                        <h3>Lâmpada do Quarto</h3>
+                        <Button className={ lamp1 ? "btn-danger" : "btn-success" } onClick={() => {lamp1 ? setlamp1(0) : setlamp1(1)}}>{lamp1 ? "Desligar" : "Ligar"}</Button>
+                        <Bar options={options} data={data4} />
                     </Col>
-                    <Col md={6}>
-                        <Form className="form">
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Form.Group>
-                                <Form.Control type="time"/>
-                            </Form.Group>
-                            <Button variant="primary" type="submit">
-                                Filtrar
-                            </Button>
-                        </Form>
-                        <Line options={options} data={data5} />
+                    <Col md={6} className="text-center">
+                        <h3>Lâmpada do Banheiro</h3>
+                    <Button className={ lamp2 ? "btn-danger" : "btn-success" } onClick={() => {lamp2 ? setlamp2(0) : setlamp2(1)}}>{lamp2 ? "Desligar" : "Ligar"}</Button>
+                        <Bar options={options} data={data5} />
                     </Col>
                 </Row>
             </Container>

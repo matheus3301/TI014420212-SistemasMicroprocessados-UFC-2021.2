@@ -5,8 +5,3 @@ body {
 .row {
     margin-bottom: 1.5rem;
 }
-
-.form {
-    display: flex;
-    justify-content: space-around;
-}
