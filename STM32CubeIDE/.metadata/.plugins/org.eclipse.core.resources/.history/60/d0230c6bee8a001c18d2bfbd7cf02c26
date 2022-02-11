@@ -166,15 +166,15 @@ int main(void)
 	  if(rbuf[0] == '1'){
 		  toogleLed1();
 
-		  println("Sending Data");
-		  updateHumidityAndTemperature();
-		  sendHumidityAndTemperatureAndLedStatus();
+			println("Sending Data");
+			updateHumidityAndTemperature();
+			sendHumidityAndTemperatureAndLedStatus();
 	  }else if(rbuf[0] == '2'){
 		  toogleLed2();
 
-		  println("Sending Data");
-		  updateHumidityAndTemperature();
-		  sendHumidityAndTemperatureAndLedStatus();
+			println("Sending Data");
+			updateHumidityAndTemperature();
+			sendHumidityAndTemperatureAndLedStatus();
 	  }
 
 

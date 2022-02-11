@@ -165,16 +165,8 @@ int main(void)
 	  HAL_UART_Receive(&huart1, rbuf, 1, 100);
 	  if(rbuf[0] == '1'){
 		  toogleLed1();
-
-		  println("Sending Data");
-		  updateHumidityAndTemperature();
-		  sendHumidityAndTemperatureAndLedStatus();
 	  }else if(rbuf[0] == '2'){
 		  toogleLed2();
-
-		  println("Sending Data");
-		  updateHumidityAndTemperature();
-		  sendHumidityAndTemperatureAndLedStatus();
 	  }
 
 
