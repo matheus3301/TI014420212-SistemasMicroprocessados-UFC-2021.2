@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include "string.h"
 
-#include "sht11_drv_sensibus.h"
+
 
 /* USER CODE END Includes */
 
@@ -45,6 +45,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+
 TIM_HandleTypeDef htim1;
 
 UART_HandleTypeDef huart1;
@@ -58,6 +60,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -66,10 +69,12 @@ static void MX_TIM1_Init(void);
 /* USER CODE BEGIN 0 */
 uint8_t rbuf [1] = {0};
 
-float humidity = 0, temperature = 0;
+uint16_t raw;
+uint32_t temp;
+char msg[20];
 
-int ledStatus1 = 0;
-int ledStatus2 = 0;
+int ledStatus1 = 1;
+int ledStatus2 = 1;
 
 
 void toogleLed1(void){
@@ -91,31 +96,17 @@ void println(char * str){
 }
 
 
-void updateHumidityAndTemperature(){
-	uint16_t tmp_temperature, tmp_humidity;
-
-	int ans = SHT11_StartTemperature();
-	if(ans == 1){
-		tmp_temperature = SHT11_ReadTemperature();
-	}
-
-	ans = SHT11_StartHumidity();
-	if(ans == 1){
-		tmp_humidity = SHT11_ReadHumidity();
-	}
-
-	temperature = SHT11_CalcTemp(tmp_temperature);
-	humidity = SHT11_CalcHumidity(tmp_humidity, temperature);
+void calcTemp(){
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	raw = HAL_ADC_GetValue(&hadc1);
+	temp = (raw*500)/4095;
 }
 
-void sendHumidityAndTemperatureAndLedStatus(){
-	char buffer[20];
 
-	int t = (int) temperature;
-	int h = (int) humidity;
-
-	sprintf(buffer, "%d, %d, %d, %d", t, h, ledStatus1, ledStatus2);
-	println(buffer);
+void sendTemperatureAndLedStatus(){
+	sprintf(msg,"%lu,%d,%d",temp, ledStatus1, ledStatus2);
+	HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg),HAL_MAX_DELAY);
 }
 
 
@@ -151,9 +142,9 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_TIM1_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 
-  SHT11_Init(GPIOA);
   HAL_TIM_Base_Start_IT(&htim1);
 
   /* USER CODE END 2 */
@@ -166,15 +157,13 @@ int main(void)
 	  if(rbuf[0] == '1'){
 		  toogleLed1();
 
-		  println("Sending Data");
-		  updateHumidityAndTemperature();
-		  sendHumidityAndTemperatureAndLedStatus();
+		  calcTemp();
+		  sendTemperatureAndLedStatus();
 	  }else if(rbuf[0] == '2'){
 		  toogleLed2();
 
-		  println("Sending Data");
-		  updateHumidityAndTemperature();
-		  sendHumidityAndTemperatureAndLedStatus();
+		  calcTemp();
+		  sendTemperatureAndLedStatus();
 	  }
 
 
@@ -193,6 +182,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -218,6 +208,57 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -333,9 +374,8 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	println("Sending Data");
-	updateHumidityAndTemperature();
-	sendHumidityAndTemperatureAndLedStatus();
+	  calcTemp();
+	  sendTemperatureAndLedStatus();
 }
 
 /* USER CODE END 4 */
