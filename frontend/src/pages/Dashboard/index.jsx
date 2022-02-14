@@ -4,7 +4,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button'
+import Button from 'react-bootstrap/Button';
+import api from '../../services/api'
 
 import {
     Chart as ChartJS,
@@ -18,7 +19,6 @@ import {
     Legend,
   } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import { Bar } from 'react-chartjs-2';
 
 ChartJS.register(
 CategoryScale,
@@ -37,141 +37,115 @@ const options = {
         legend: {
         position: 'top',
         },
+    pan: {
+        enabled: true,
+        mode: 'x',
+        },
+        limits: {
+        x: { min: 5, max: 7 },
+        },
+        zoom: {
+        pan: {
+            enabled: true,
+        },
+        },
     },
 };
 
 const Dashboard = () => {
 
-    const responseapi = [
-        {
-            "timestamp": "00:00:10",
-            "temperature":50,
-            "humidity":80,
-            "statusLed1": 0,
-            "statusLed2": 1
-        },
-        {
-            "timestamp": "00:00:30",
-            "temperature":60,
-            "humidity":85,
-            "statusLed1": 1,
-            "statusLed2": 1
-        },
-        {
-            "timestamp": "00:00:50",
-            "temperature":55,
-            "humidity": 90,
-            "statusLed1": 1,
-            "statusLed2": 0
-        }
-    ]
-
-    const labels = responseapi.map(a => a.timestamp);
-
+    const [responseapi, setResponse] = useState([])
+    const [labels, setLabels] = useState([])
     const [lamp1, setlamp1] = useState(0)
     const [lamp2, setlamp2] = useState(0)
 
-    const [data1, setData1] = useState({
-        labels,
-        datasets: [
-            {
-                label: 'Temperatura',
-                data: responseapi.map(a => a.temperature),
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            }
-        ],
+    const [dataTemp, setDataTemp] = useState({
+        labels: [],
+        datasets: [{
+          label: 'Temperatura',
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderColor: 'rgb(255, 99, 132)',
+          data: [],
+        }]
       })
 
-    const [data2, setData2] = useState({
-        labels,
-        datasets: [
-            {
-                label: 'Umidade',
-                data: responseapi.map(a => a.humidity),
-                borderColor: 'rgb(30, 166, 66)',
-                backgroundColor: 'rgba(30, 166, 66, 0.5)',
-            }
-        ],
-    })
+    const [dataled1, setDataled1] = useState({
+        labels: [],
+        datasets: [{
+          label: 'Led 1',
+          backgroundColor: 'rgb(18, 117, 18)',
+          borderColor: 'rgb(18, 117, 18)',
+          data: [],
+        }]
+      })
 
-    const [data4, setData4] = useState({
-        labels,
-        datasets: [
-            {
-                label: 'Lampada 1',
-                data: responseapi.map(a => a.statusLed1),
-                borderColor: 'rgb(20, 20, 219)',
-                backgroundColor: 'rgba(20, 20, 219, 0.5)',
-            }
-        ],
-        })
+    const [dataled2, setDataled2] = useState({
+        labels: [],
+        datasets: [{
+          label: 'Led 2',
+          backgroundColor: 'rgb(12, 22, 112)',
+          borderColor: 'rgb(12, 22, 112)',
+          data: [],
+        }]
+      })
 
-    const [data5, setData5] = useState({
-        labels,
-        datasets: [
-            {
-                label: 'Lampada 2',
-                data: responseapi.map(a => a.statusLed2),
-                borderColor: 'rgb(153, 20, 219)',
-                backgroundColor: 'rgba(153, 20, 219, 0.5)',
-            }
-        ],
+    function getData(){
+        api.get('/api/data').then((response) => {
+            setResponse(response.data)
+            setDataTemp({
+                labels: response.data.map(a => new Date(a.timestamp).toLocaleTimeString()),
+                datasets: [{
+                  label: 'Temperatura',
+                  backgroundColor: 'rgb(255, 99, 132)',
+                  borderColor: 'rgb(255, 99, 132)',
+                  data: response.data.map(a => a.temperature),
+                }]
+              })
+            setDataled1({
+                labels: response.data.map(a => new Date(a.timestamp).toLocaleTimeString()),
+                datasets: [{
+                  label: 'Led 1',
+                  backgroundColor: 'rgb(18, 117, 18)',
+                  borderColor: 'rgb(18, 117, 18)',
+                  data: response.data.map(a => a.led1),
+                }]
+              })
+            setDataled2({
+                labels: response.data.map(a => new Date(a.timestamp).toLocaleTimeString()),
+                datasets: [{
+                  label: 'Led 2',
+                  backgroundColor: 'rgb(12, 22, 112)',
+                  borderColor: 'rgb(12, 22, 112)',
+                  data: response.data.map(a => a.led2),
+                }]
+              })
+            setlamp1(response.data[response.data.length - 1].led1)
+            setlamp2(response.data[response.data.length - 1].led2)
+        }, (error) => {
+            console.log("Erro na Requisição")
         })
-  
+    }
+
     useEffect(() => {
-        setlamp1(responseapi[responseapi.length - 1].statusLed1)
-        setlamp2(responseapi[responseapi.length - 1].statusLed2)
-        setInterval(() => {
-            setData1({
-            labels,
-            datasets: [
-                {
-                label: 'Temperatura',
-                data: responseapi.map(a => a.temperature),
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                },
-            ],
-            })
-            setData2({
-            labels,
-            datasets: [
-                {
-                    label: 'Umidade',
-                    data: responseapi.map(a => a.humidity),
-                    borderColor: 'rgb(30, 166, 66)',
-                    backgroundColor: 'rgba(30, 166, 66, 0.5)',
-                }
-            ],
-            })
-            setData4({
-            labels,
-            datasets: [
-                {
-                    label: 'Lampada 1',
-                    data: responseapi.map(a => a.statusLed1),
-                    borderColor: 'rgb(20, 20, 219)',
-                    backgroundColor: 'rgba(20, 20, 219, 0.5)',
-                }
-            ],
-            })
-            setData5({
-            labels,
-            datasets: [
-                {
-                    label: 'Lampada 2',
-                    data: responseapi.map(a => a.statusLed2),
-                    borderColor: 'rgb(153, 20, 219)',
-                    backgroundColor: 'rgba(153, 20, 219, 0.5)',
-                }
-            ],
-            })
-            setlamp1(responseapi[responseapi.length - 1].statusLed1)
-            setlamp2(responseapi[responseapi.length - 1].statusLed2)
-            console.log(new Date())
-        }, 300000);
-    })
+        getData();
+    }, [])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+          getData();
+        }, 1000);
+        return () => clearInterval(interval);
+      }, []);
+
+    function changeLed1(e){
+        e.preventDefault();
+        api.post('/api/led/1');
+    }
+
+    function changeLed2(e){
+        e.preventDefault();
+        api.post('/api/led/2');
+    }
 
     return(
         <>
@@ -189,23 +163,19 @@ const Dashboard = () => {
                 <Row>
                     <Col className="text-center">
                         <h3>Temperatura</h3>
-                        <Line options={options} data={data1} />
-                    </Col>
-                    <Col className="text-center">
-                        <h3>Umidade</h3>
-                        <Line options={options} data={data2} />
+                        <Line options={options} data={dataTemp} />
                     </Col>
                 </Row>
                 <Row>
                     <Col md={6} className="text-center">
                         <h3>Lâmpada do Quarto</h3>
-                        <Button className={ lamp1 ? "btn-danger" : "btn-success" } onClick={() => {lamp1 ? setlamp1(0) : setlamp1(1)}}>{lamp1 ? "Desligar" : "Ligar"}</Button>
-                        <Bar options={options} data={data4} />
+                        <Button className={ lamp1 ? "btn-danger" : "btn-success" } onClick={changeLed1}>{lamp1 ? "Desligar" : "Ligar"}</Button>
+                        <Line options={options} data={dataled1} />
                     </Col>
                     <Col md={6} className="text-center">
                         <h3>Lâmpada do Banheiro</h3>
-                    <Button className={ lamp2 ? "btn-danger" : "btn-success" } onClick={() => {lamp2 ? setlamp2(0) : setlamp2(1)}}>{lamp2 ? "Desligar" : "Ligar"}</Button>
-                        <Bar options={options} data={data5} />
+                    <Button className={ lamp2 ? "btn-danger" : "btn-success" } onClick={changeLed2}>{lamp2 ? "Desligar" : "Ligar"}</Button>
+                        <Line options={options} data={dataled2} />
                     </Col>
                 </Row>
             </Container>
