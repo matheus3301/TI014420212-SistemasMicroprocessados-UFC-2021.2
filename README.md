@@ -7,7 +7,7 @@
  - Matheus Rocha Monteiro - 494577
  - Vitor Rosa Evangelista - 494132
 
-## 📹 Link para a apresentação: (YOUTUBE)
+## 📹 Link para a apresentação: [Vídeo no Youtube](https://www.youtube.com/watch?v=5LZEWzR2bxk)
 
 ## 💻 Pré-requisitos
 
