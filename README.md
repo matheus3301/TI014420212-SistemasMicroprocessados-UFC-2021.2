@@ -3,7 +3,7 @@
 
 ## 👨‍🏫 Integrantes da Equipe:
  - Danilo Palheta Meireles - 500863
- - Helano Fontenele Alexandrino - 
+ - Helano Fontenele Alexandrino - 493450
  - Matheus Rocha Monteiro - 494577
  - Vitor Rosa Evangelista - 494132
 
